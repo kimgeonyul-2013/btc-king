@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDLE BTC KING - 켜두기만 해도 왕이 되는 곳!</title>
+    <style>
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: #0d1117;
+            color: #ffffff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #161b22;
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid #30363d;
+        }
+        .ad-box {
+            background: #21262d;
+            border: 1px dashed #58a6ff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            color: #8b949e;
+            font-size: 13px;
+        }
+        .king-throne {
+            background: linear-gradient(135deg, #f7931a, #b45309);
+            color: #000;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        .king-throne h2 {
+            margin: 5px 0;
+            font-size: 26px;
+        }
+        .king-msg {
+            background: rgba(0, 0, 0, 0.15);
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        input {
+            width: 80%;
+            padding: 12px;
+            margin: 6px 0;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            background: #0d1117;
+            color: #fff;
+            font-size: 15px;
+        }
+        .mining-box {
+            background: #1f242c;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 1px solid #f7931a;
+        }
+        .score-big {
+            font-size: 32px;
+            font-weight: bold;
+            color: #f7931a;
+            margin: 10px 0;
+        }
+        button {
+            background-color: #238636;
+            color: #fff;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #2ea043;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>👑 IDLE BTC KING 👑</h1>
+    <p>아무것도 안 하고 화면을 켜두기만 해도 점수가 올라갑니다!<br>
+    <small style="color:#8b949e;">Just keep this page open to mine points and become the King!</small></p>
+
+    <!-- [상단 광고 배너 자리] A-ADS 코드 삽입 위치 -->
+    <div class="ad-box" id="ad-top">
+        [상단 광고 배너 영역 - A-ADS 코드 삽입]<br>
+        방문자가 화면을 보고 있는 동안 자동으로 노출 수익이 쌓입니다.
+    </div>
+
+    <!-- 현재 왕(1등) 표시 영역 -->
+    <div class="king-throne">
+        <div>🏆 CURRENT KING (현재 왕) 🏆</div>
+        <h2 id="king-name">초대 왕 (Satoshi)</h2>
+        <div>왕의 점수: <span id="king-score">50</span> PTS</div>
+        <div class="king-msg" id="king-message">"화면 켜두고 나 이길 수 있으면 이겨봐!"</div>
+    </div>
+
+    <!-- 닉네임 및 왕좌 등록 -->
+    <div>
+        <input type="text" id="user-name" placeholder="닉네임 입력 (Nickname)" maxlength="15">
+        <input type="text" id="user-msg" placeholder="왕이 되면 띄울 한 줄 공지 (Message)" maxlength="40">
+        <br>
+        <button onclick="claimThrone()">👑 내 닉네임으로 왕좌 도전하기</button>
+    </div>
+
+    <!-- 자동 채굴 현황 -->
+    <div class="mining-box">
+        <div>⛏️ 자동 채굴 작동 중... (1초당 +1 PTS)</div>
+        <div class="score-big"><span id="my-score">0</span> PTS</div>
+        <small style="color:#8b949e;">페이지를 닫지 않고 켜두면 계속 올라갑니다.</small>
+    </div>
+
+    <!-- [하단 광고 배너 자리] A-ADS 코드 삽입 위치 -->
+    <div class="ad-box" id="ad-bottom">
+        [하단 광고 배너 영역 - A-ADS 코드 삽입]
+    </div>
+</div>
+
+<script>
+    let myScore = parseInt(localStorage.getItem('myScore')) || 0;
+    let kingName = localStorage.getItem('kingName') || "초대 왕 (Satoshi)";
+    let kingScore = parseInt(localStorage.getItem('kingScore')) || 50;
+    let kingMessage = localStorage.getItem('kingMessage') || "화면 켜두고 나 이길 수 있으면 이겨봐!";
+    let isClaimed = false;
+
+    function updateUI() {
+        document.getElementById('my-score').innerText = myScore;
+        document.getElementById('king-name').innerText = kingName;
+        document.getElementById('king-score').innerText = kingScore;
+        document.getElementById('king-message').innerText = `"${kingMessage}"`;
+    }
+
+    function claimThrone() {
+        const nameInput = document.getElementById('user-name').value.trim();
+        if (!nameInput) {
+            alert("먼저 닉네임을 입력해주세요!");
+            return;
+        }
+        isClaimed = true;
+        alert(`${nameInput}님으로 등록되었습니다! 이제 화면을 켜두고 점수를 모으세요!`);
+    }
+
+    // 1초마다 자동으로 1점씩 상승 (방문자 체류 시간 유도)
+    setInterval(() => {
+        myScore += 1;
+        localStorage.setItem('myScore', myScore);
+
+        if (isClaimed && myScore > kingScore) {
+            const nameInput = document.getElementById('user-name').value.trim();
+            const msgInput = document.getElementById('user-msg').value.trim();
+
+            kingScore = myScore;
+            kingName = nameInput;
+            kingMessage = msgInput ? msgInput : "내가 새로운 왕이다!";
+
+            localStorage.setItem('kingScore', kingScore);
+            localStorage.setItem('kingName', kingName);
+            localStorage.setItem('kingMessage', kingMessage);
+        }
+
+        updateUI();
+    }, 1000);
+
+    updateUI();
+</script>
+
+</body>
+</html>
