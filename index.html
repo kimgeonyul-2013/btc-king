@@ -1,275 +1,659 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>왕좌의 게임 - 체류 시간 계급 시스템</title>
-    <style>
-        body {
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .container {
-            max-width: 600px;
-            width: 100%;
-            background: #1e1e1e;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            margin-top: 20px;
-        }
-        h1 {
-            text-align: center;
-            color: #ffd700;
-            margin-bottom: 5px;
-        }
-        .subtitle {
-            text-align: center;
-            color: #aaa;
-            font-size: 14px;
-            margin-bottom: 25px;
-        }
-        /* 내 상태 카드 */
-        .my-status {
-            background: linear-gradient(135deg, #2a2a35, #1f1f28);
-            border: 2px solid #444;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        .my-status.is-king {
-            border-color: #ffd700;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-        }
-        .rank-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-        .points-display {
-            font-size: 28px;
-            font-weight: 800;
-            color: #4ade80;
-            margin: 10px 0;
-        }
-        /* 랭킹 보드 */
-        .ranking-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .user-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #262626;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border-left: 5px solid #555;
-        }
-        .user-item.king-row {
-            border-left-color: #ffd700;
-            background: #2d2a1e;
-        }
-        .user-item.me-row {
-            border: 1px solid #4ade80;
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .user-rank-tag {
-            font-size: 12px;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-weight: bold;
-        }
-        /* 왕 전용 컨트롤 */
-        select {
-            background: #333;
-            color: white;
-            border: 1px solid #ffd700;
-            padding: 5px 8px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .king-notice {
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid #ffd700;
-            color: #ffd700;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 14px;
-            margin-bottom: 15px;
-            display: none;
-        }
-        /* 계급별 색상 */
-        .rank-왕 { background: #ffd700; color: #000; }
-        .rank-공작 { background: #a855f7; color: #fff; }
-        .rank-귀족 { background: #3b82f6; color: #fff; }
-        .rank-기사 { background: #10b981; color: #fff; }
-        .rank-평민 { background: #6b7280; color: #fff; }
-        .rank-노예 { background: #ef4444; color: #fff; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOOLBOX - 무료 온라인 도구</title>
+<style>
+* { box-sizing:border-box; }
+
+body {
+    margin:0;
+    background:#101116;
+    color:#eee;
+    font-family:Arial,sans-serif;
+}
+
+header {
+    padding:25px 7%;
+    border-bottom:1px solid #292a35;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo {font-size:25px;font-weight:900;color:#a78bfa;}
+.logo span {color:white;}
+header small {color:#888;}
+
+main {max-width:1050px;margin:auto;padding:25px 18px;}
+
+.hero {margin:30px 0 35px;}
+.hero h1 {font-size:36px;margin-bottom:10px;}
+.hero p {color:#999;}
+
+.search {
+    width:100%;
+    padding:15px;
+    background:#1c1d26;
+    border:1px solid #333;
+    border-radius:10px;
+    color:white;
+    font-size:15px;
+    outline:none;
+}
+
+.search:focus {border-color:#a78bfa;}
+
+.category {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:20px 0;
+}
+
+.category button {
+    background:#20212b;
+    color:#aaa;
+    border:0;
+    padding:10px 17px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.category button.active {
+    background:#7c3aed;
+    color:white;
+}
+
+.tools {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+    gap:15px;
+}
+
+.tool {
+    background:#1b1c25;
+    border:1px solid #30313c;
+    padding:22px;
+    border-radius:13px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.tool:hover {
+    border-color:#a78bfa;
+    transform:translateY(-3px);
+}
+
+.tool .emoji {font-size:27px;}
+.tool h3 {margin:15px 0 7px;}
+.tool p {color:#888;font-size:13px;margin:0;}
+
+.panel {
+    display:none;
+    background:#1b1c25;
+    border:1px solid #393944;
+    border-radius:14px;
+    padding:24px;
+    margin-top:25px;
+}
+
+.panel h2 {margin-top:0;}
+
+.panel input,
+.panel textarea,
+.panel select {
+    width:100%;
+    padding:13px;
+    margin:7px 0;
+    background:#101116;
+    color:white;
+    border:1px solid #444;
+    border-radius:8px;
+    font-size:15px;
+}
+
+.panel textarea {min-height:120px;resize:vertical;}
+
+.action {
+    padding:12px 17px;
+    background:#7c3aed;
+    border:0;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+    margin:5px 3px 5px 0;
+}
+
+.action:hover {background:#6d28d9;}
+.close {float:right;background:#333;}
+
+.result {
+    background:#101116;
+    padding:14px;
+    border-radius:8px;
+    margin-top:12px;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+}
+
+.ad {
+    width:100%;
+    min-height:110px;
+    margin:20px auto;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.ad iframe {
+    border:0;
+    padding:0;
+    width:70%;
+    min-height:100px;
+    overflow:hidden;
+    display:block;
+    margin:auto;
+}
+
+footer {
+    text-align:center;
+    padding:35px;
+    color:#666;
+    border-top:1px solid #292a35;
+    margin-top:50px;
+}
+</style>
 </head>
+
 <body>
 
-    <!-- BEGIN AADS AD UNIT 2461733 -->
-    <div id="frame" style="width: 100%;margin: auto;position: relative; z-index: 99998;">
-        <iframe data-aa='2461733' src='//acceptable.a-ads.com/2461733/?size=Adaptive'
-                style='border:0; padding:0; width:70%; height:auto; overflow:hidden;display: block;margin: auto'></iframe>
+<header>
+    <div class="logo">TOOL<span>BOX.</span></div>
+    <small>Free Online Tools</small>
+</header>
+
+<main>
+
+<section class="hero">
+    <h1>필요한 도구를 한곳에서.</h1>
+    <p>설치 없이 바로 사용할 수 있는 무료 온라인 도구</p>
+</section>
+
+<!-- BEGIN AADS AD UNIT 2461784 -->
+<div id="frame" class="ad">
+    <iframe data-aa="2461784"
+        src="//acceptable.a-ads.com/2461784/?size=Adaptive"
+        style="border:0;padding:0;width:70%;height:auto;overflow:hidden;display:block;margin:auto">
+    </iframe>
+</div>
+<!-- END AADS AD UNIT 2461784 -->
+
+<input class="search" id="search"
+placeholder="도구 검색하기..." oninput="filterTools()">
+
+<div class="category">
+    <button class="active" onclick="setCategory('all',this)">전체</button>
+    <button onclick="setCategory('basic',this)">기본 도구</button>
+    <button onclick="setCategory('text',this)">텍스트</button>
+    <button onclick="setCategory('dev',this)">개발 도구</button>
+</div>
+
+<div class="tools" id="tools">
+
+    <div class="tool" data-category="basic" onclick="openTool('calculator')">
+        <div class="emoji">🧮</div>
+        <h3>계산기</h3>
+        <p>간단한 수학 계산</p>
     </div>
-    <!-- END AADS AD UNIT 2461733 -->
 
-    <div class="container">
-        <h1>👑 포인트 왕국</h1>
-        <p class="subtitle">웹사이트에 오래 머무를수록 포인트가 쌓이고 계급이 오릅니다! (1초당 +10P)</p>
-
-        <!-- 내 정보 표시 영역 -->
-        <div class="my-status" id="myStatusBox">
-            <div>나의 현재 계급</div>
-            <div class="rank-badge rank-평민" id="myRankBadge">평민</div>
-            <div class="points-display"><span id="myPoints">0</span> P</div>
-            <div style="font-size: 13px; color: #888;" id="nextRankInfo">다음 계급(기사)까지 100 P 남음</div>
-        </div>
-
-        <!-- 왕이 되었을 때 나타나는 안내 문구 -->
-        <div class="king-notice" id="kingNotice">
-            👑 당신은 이 구역의 <strong>왕</strong>입니다! 아래 목록에서 다른 사람들의 계급을 마음대로 변경할 수 있습니다.
-        </div>
-
-        <!-- 전체 유저 랭킹 및 계급 관리 -->
-        <h3>🏆 실시간 왕국 서열</h3>
-        <ul class="ranking-list" id="rankingList"></ul>
+    <div class="tool" data-category="text" onclick="openTool('counter')">
+        <div class="emoji">📝</div>
+        <h3>글자 수 세기</h3>
+        <p>글자와 단어 개수 확인</p>
     </div>
 
-    <script>
-        // 계급 기준표 (포인트에 따른 자동 승급)
-        const RANKS = [
-            { name: '노예', minPoints: -9999 },
-            { name: '평민', minPoints: 0 },
-            { name: '기사', minPoints: 100 },
-            { name: '귀족', minPoints: 300 },
-            { name: '공작', minPoints: 600 }
-        ];
+    <div class="tool" data-category="basic" onclick="openTool('random')">
+        <div class="emoji">🎲</div>
+        <h3>랜덤 숫자</h3>
+        <p>원하는 범위에서 숫자 추첨</p>
+    </div>
 
-        // 유저 데이터 초기화 (로컬 스토리지에 내 포인트 저장)
-        let savedMyPoints = parseInt(localStorage.getItem('myWebPoints')) || 0;
+    <div class="tool" data-category="basic" onclick="openTool('password')">
+        <div class="emoji">🔐</div>
+        <h3>비밀번호 생성</h3>
+        <p>무작위 비밀번호 만들기</p>
+    </div>
 
-        let users = [
-            { id: 'me', name: '나 (Me)', points: savedMyPoints, customRank: null, isMe: true },
-            { id: 'bot1', name: '기존폭군', points: 450, customRank: null, isMe: false },
-            { id: 'bot2', name: '시간부자', points: 250, customRank: null, isMe: false },
-            { id: 'bot3', name: '잠수타는중', points: 120, customRank: null, isMe: false },
-            { id: 'bot4', name: '뉴비123', points: 30, customRank: null, isMe: false }
-        ];
+    <div class="tool" data-category="basic" onclick="openTool('timer')">
+        <div class="emoji">⏱️</div>
+        <h3>타이머</h3>
+        <p>초 단위 시간 측정</p>
+    </div>
 
-        // 포인트 기준 자동 계급 계산 함수
-        function getAutoRank(points) {
-            let currentRank = '평민';
-            for (let r of RANKS) {
-                if (points >= r.minPoints) {
-                    currentRank = r.name;
-                }
-            }
-            return currentRank;
+    <div class="tool" data-category="text" onclick="openTool('memo')">
+        <div class="emoji">📒</div>
+        <h3>메모장</h3>
+        <p>브라우저에 메모 저장</p>
+    </div>
+
+    <div class="tool" data-category="dev" onclick="openTool('json')">
+        <div class="emoji">💻</div>
+        <h3>JSON 정리</h3>
+        <p>JSON 데이터 정렬 및 검사</p>
+    </div>
+
+    <div class="tool" data-category="basic" onclick="openTool('unit')">
+        <div class="emoji">📏</div>
+        <h3>단위 변환</h3>
+        <p>길이 단위 변환하기</p>
+    </div>
+
+</div>
+
+<section class="panel" id="panel">
+    <button class="action close" onclick="closeTool()">닫기 ✕</button>
+    <h2 id="toolTitle">도구</h2>
+    <div id="toolContent"></div>
+</section>
+
+<!-- BEGIN AADS AD UNIT 2461784 -->
+<div id="frame" class="ad">
+    <iframe data-aa="2461784"
+        src="//acceptable.a-ads.com/2461784/?size=Adaptive"
+        style="border:0;padding:0;width:70%;height:auto;overflow:hidden;display:block;margin:auto">
+    </iframe>
+</div>
+<!-- END AADS AD UNIT 2461784 -->
+
+</main>
+
+<footer>
+    TOOLBOX © 2026 · Free Online Tools
+</footer>
+
+<script>
+
+const panel = document.getElementById('panel');
+const content = document.getElementById('toolContent');
+const title = document.getElementById('toolTitle');
+
+function openTool(name) {
+
+    panel.style.display = 'block';
+
+    const tools = {
+
+        calculator: `
+            <input id="calcA" type="number" placeholder="첫 번째 숫자">
+            <input id="calcB" type="number" placeholder="두 번째 숫자">
+            <button class="action" onclick="calculate('+')">+</button>
+            <button class="action" onclick="calculate('-')">−</button>
+            <button class="action" onclick="calculate('*')">×</button>
+            <button class="action" onclick="calculate('/')">÷</button>
+            <div class="result" id="calcResult">결과 대기 중</div>
+        `,
+
+        counter: `
+            <textarea id="textInput"
+                placeholder="텍스트를 입력하세요..."
+                oninput="countText()"></textarea>
+            <div class="result" id="countResult">
+                글자 수: 0
+                단어 수: 0
+                공백 제외: 0
+            </div>
+        `,
+
+        random: `
+            <input type="number" id="minNum" value="1" placeholder="최솟값">
+            <input type="number" id="maxNum" value="100" placeholder="최댓값">
+            <button class="action" onclick="randomNumber()">추첨하기</button>
+            <div class="result" id="randomResult">결과 대기 중</div>
+        `,
+
+        password: `
+            <input type="number" id="passLength" value="16"
+                min="8" max="64" placeholder="길이 (8~64)">
+            <button class="action" onclick="generatePassword()">생성하기</button>
+            <div class="result" id="passResult"></div>
+            <button class="action" onclick="copyResult('passResult')">복사</button>
+        `,
+
+        timer: `
+            <input type="number" id="timerSeconds" value="60" min="1">
+            <div class="result" id="timerDisplay">60초</div>
+            <button class="action" onclick="startTimer()">시작</button>
+            <button class="action" onclick="stopTimer()">정지</button>
+            <button class="action" onclick="resetTimer()">초기화</button>
+        `,
+
+        memo: `
+            <textarea id="memoText" placeholder="메모를 입력하세요..."></textarea>
+            <button class="action" onclick="saveMemo()">저장</button>
+            <button class="action" onclick="loadMemo()">불러오기</button>
+            <div class="result" id="memoResult">브라우저에 저장됩니다.</div>
+        `,
+
+        json: `
+            <textarea id="jsonInput"
+                placeholder='{"name":"Toolbox","version":1}'></textarea>
+            <button class="action" onclick="formatJSON()">정리하기</button>
+            <button class="action" onclick="minifyJSON()">압축하기</button>
+            <div class="result" id="jsonResult"></div>
+            <button class="action" onclick="copyResult('jsonResult')">복사</button>
+        `,
+
+        unit: `
+            <input type="number" id="unitInput" value="1">
+            <select id="unitFrom">
+                <option value="mm">밀리미터</option>
+                <option value="cm">센티미터</option>
+                <option value="m" selected>미터</option>
+                <option value="km">킬로미터</option>
+            </select>
+            <select id="unitTo">
+                <option value="mm">밀리미터</option>
+                <option value="cm" selected>센티미터</option>
+                <option value="m">미터</option>
+                <option value="km">킬로미터</option>
+            </select>
+            <button class="action" onclick="convertUnit()">변환</button>
+            <div class="result" id="unitResult"></div>
+        `
+    };
+
+    const names = {
+        calculator:'계산기',
+        counter:'글자 수 세기',
+        random:'랜덤 숫자 생성기',
+        password:'비밀번호 생성기',
+        timer:'타이머',
+        memo:'메모장',
+        json:'JSON 정리 도구',
+        unit:'단위 변환기'
+    };
+
+    title.textContent = names[name];
+    content.innerHTML = tools[name];
+
+    if(name === 'memo') {
+        document.getElementById('memoText').value =
+            localStorage.getItem('toolboxMemo') || '';
+    }
+
+    if(name === 'timer') {
+        stopTimer();
+        timerRemaining = Math.max(1,
+            Number(document.getElementById('timerSeconds').value) || 60);
+    }
+
+    panel.scrollIntoView({behavior:'smooth'});
+}
+
+function closeTool() {
+    panel.style.display = 'none';
+    stopTimer();
+}
+
+function calculate(op) {
+
+    const aInput = document.getElementById('calcA');
+    const bInput = document.getElementById('calcB');
+
+    if(aInput.value === '' || bInput.value === '') {
+        return alert('숫자를 입력하세요.');
+    }
+
+    const a = Number(aInput.value);
+    const b = Number(bInput.value);
+
+    if(op === '/' && b === 0)
+        return alert('0으로 나눌 수 없습니다.');
+
+    const result =
+        op === '+' ? a+b :
+        op === '-' ? a-b :
+        op === '*' ? a*b : a/b;
+
+    document.getElementById('calcResult').textContent =
+        '결과: ' + result;
+}
+
+function countText() {
+
+    const text = document.getElementById('textInput').value;
+    const words = text.trim() ?
+        text.trim().split(/\s+/).length : 0;
+
+    document.getElementById('countResult').textContent =
+        `글자 수: ${text.length}
+단어 수: ${words}
+공백 제외: ${text.replace(/\s/g,'').length}`;
+}
+
+function randomNumber() {
+
+    const min = Number(document.getElementById('minNum').value);
+    const max = Number(document.getElementById('maxNum').value);
+
+    if(!Number.isSafeInteger(min) ||
+       !Number.isSafeInteger(max) || min > max) {
+        return alert('올바른 범위를 입력하세요.');
+    }
+
+    const range = max - min + 1;
+
+    if(range > 4294967296)
+        return alert('범위가 너무 큽니다.');
+
+    const limit = Math.floor(4294967296 / range) * range;
+    const array = new Uint32Array(1);
+    let value;
+
+    do {
+        crypto.getRandomValues(array);
+        value = array[0];
+    } while(value >= limit);
+
+    document.getElementById('randomResult').textContent =
+        '결과: ' + (min + value % range);
+}
+
+function generatePassword() {
+
+    const length = Number(document.getElementById('passLength').value);
+
+    if(!Number.isInteger(length) || length < 8 || length > 64)
+        return alert('8~64 사이로 입력하세요.');
+
+    const chars =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+
+    const bytes = new Uint8Array(length);
+    crypto.getRandomValues(bytes);
+
+    let password = '';
+
+    for(let b of bytes)
+        password += chars[b % chars.length];
+
+    document.getElementById('passResult').textContent = password;
+}
+
+let timerInterval = null;
+let timerRemaining = 60;
+
+function startTimer() {
+
+    if(timerInterval) return;
+
+    if(timerRemaining <= 0) resetTimer();
+    if(timerRemaining <= 0) return;
+
+    updateTimer();
+
+    timerInterval = setInterval(() => {
+
+        timerRemaining--;
+        updateTimer();
+
+        if(timerRemaining <= 0) {
+            stopTimer();
+            alert('시간 종료!');
         }
 
-        // 다음 계급까지 남은 포인트 계산
-        function getNextRankText(points, isKing) {
-            if (isKing) return "최고 권력자(왕) 자리에 올랐습니다!";
-            for (let r of RANKS) {
-                if (points < r.minPoints) {
-                    return `다음 계급(${r.name})까지 ${r.minPoints - points} P 남음`;
-                }
-            }
-            return "최고 계급 달성! 1위가 되어 왕좌를 차지하세요!";
-        }
+    },1000);
+}
 
-        // 왕이 다른 사람의 계급을 강제로 변경하는 함수
-        function changeUserRank(userId, newRank) {
-            const target = users.find(u => u.id === userId);
-            if (target) {
-                target.customRank = newRank === 'AUTO' ? null : newRank;
-                render();
-            }
-        }
+function updateTimer() {
 
-        // 화면 업데이트 함수
-        function render() {
-            // 1. 포인트 높은 순으로 정렬
-            users.sort((a, b) => b.points - a.points);
+    const el = document.getElementById('timerDisplay');
 
-            // 2. 1등이 왕이 됨
-            const kingUser = users[0];
-            const amIKing = kingUser.isMe;
+    if(el) el.textContent = timerRemaining + '초';
+}
 
-            // 3. 내 상태 업데이트
-            const me = users.find(u => u.isMe);
-            let myFinalRank = amIKing ? '왕' : (me.customRank || getAutoRank(me.points));
+function stopTimer() {
 
-            const myStatusBox = document.getElementById('myStatusBox');
-            const myRankBadge = document.getElementById('myRankBadge');
-            const kingNotice = document.getElementById('kingNotice');
+    clearInterval(timerInterval);
+    timerInterval = null;
+}
 
-            myRankBadge.textContent = myFinalRank;
-            myRankBadge.className = `rank-badge rank-${myFinalRank}`;
-            document.getElementById('myPoints').textContent = me.points.toLocaleString();
-            document.getElementById('nextRankInfo').textContent = getNextRankText(me.points, amIKing);
+function resetTimer() {
 
-            if (amIKing) {
-                myStatusBox.classList.add('is-king');
-                kingNotice.style.display = 'block';
-            } else {
-                myStatusBox.classList.remove('is-king');
-                kingNotice.style.display = 'none';
-            }
+    stopTimer();
 
-            // 4. 랭킹 리스트 렌더링
-            const listEl = document.getElementById('rankingList');
-            listEl.innerHTML = '';
+    const input = document.getElementById('timerSeconds');
 
-            users.forEach((user, index) => {
-                const isKing = (index === 0);
-                // 왕이면 무조건 '왕', 아니면 왕이 지정한 계급 우선, 없으면 포인트 자동 계급
-                const displayRank = isKing ? '왕' : (user.customRank || getAutoRank(user.points));
+    timerRemaining = Math.max(1,Number(input.value) || 60);
 
-                const li = document.createElement('li');
-                li.className = `user-item ${isKing ? 'king-row' : ''} ${user.isMe ? 'me-row' : ''}`;
+    updateTimer();
+}
 
-                // 왕일 경우, 자신보다 낮은 계급(2위 이하)의 계급을 바꿀 수 있는 드롭다운 생성
-                let kingControlHTML = '';
-                if (amIKing && !isKing) {
-                    kingControlHTML = `
-                        <select onchange="changeUserRank('${user.id}', this.value)">
-                            <option value="AUTO" ${!user.customRank ? 'selected' : ''}>자동(${getAutoRank(user.points)})</option>
-                            <option value="공작" ${user.customRank === '공작' ? 'selected' : ''}>공작 임명</option>
-                            <option value="귀족" ${user.customRank === '귀족' ? 'selected' : ''}>귀족 임명</option>
-                            <option value="기사" ${user.customRank === '기사' ? 'selected' : ''}>기사 임명</option>
-                            <option value="평민" ${user.customRank === '평민' ? 'selected' : ''}>평민 강등</option>
-                            <option value="노예" ${user.customRank === '노예' ? 'selected' : ''}>노예 강등</option>
-                        </select>
-                    `;
-                }
+function saveMemo() {
 
-                li.innerHTML = `
-                    <div class="user-info">
-                        <strong>${index + 1}위</strong>
-                        <span class="user-rank-tag rank-${displayRank}">${displayRank}</span>
-                        <span>${user.name}</span>
-                    </div>
+    localStorage.setItem('toolboxMemo',
+        document.getElementById('memoText').value);
+
+    document.getElementById('memoResult').textContent =
+        '저장 완료!';
+}
+
+function loadMemo() {
+
+    document.getElementById('memoText').value =
+        localStorage.getItem('toolboxMemo') || '';
+
+    document.getElementById('memoResult').textContent =
+        '불러오기 완료!';
+}
+
+function formatJSON() {
+
+    try {
+
+        const obj = JSON.parse(
+            document.getElementById('jsonInput').value
+        );
+
+        document.getElementById('jsonResult').textContent =
+            JSON.stringify(obj,null,4);
+
+    } catch(e) {
+
+        document.getElementById('jsonResult').textContent =
+            'JSON 오류: ' + e.message;
+    }
+}
+
+function minifyJSON() {
+
+    try {
+
+        const obj = JSON.parse(
+            document.getElementById('jsonInput').value
+        );
+
+        document.getElementById('jsonResult').textContent =
+            JSON.stringify(obj);
+
+    } catch(e) {
+
+        document.getElementById('jsonResult').textContent =
+            'JSON 오류: ' + e.message;
+    }
+}
+
+function convertUnit() {
+
+    const factors = {
+        mm:0.001,
+        cm:0.01,
+        m:1,
+        km:1000
+    };
+
+    const value = Number(document.getElementById('unitInput').value);
+    const from = document.getElementById('unitFrom').value;
+    const to = document.getElementById('unitTo').value;
+
+    const result = value * factors[from] / factors[to];
+
+    document.getElementById('unitResult').textContent =
+        result.toLocaleString('ko-KR',{
+            maximumFractionDigits:10
+        }) + ' ' + to;
+}
+
+function copyResult(id) {
+
+    const text = document.getElementById(id).textContent;
+
+    navigator.clipboard.writeText(text)
+        .then(() => alert('복사 완료!'))
+        .catch(() => alert('복사할 수 없습니다.'));
+}
+
+let currentCategory = 'all';
+
+function setCategory(category,button) {
+
+    currentCategory = category;
+
+    document.querySelectorAll('.category button')
+        .forEach(b => b.classList.remove('active'));
+
+    button.classList.add('active');
+
+    filterTools();
+}
+
+function filterTools() {
+
+    const query =
+        document.getElementById('search').value.toLowerCase();
+
+    document.querySelectorAll('.tool').forEach(tool => {
+
+        const category = tool.dataset.category;
+
+        const matchCategory =
+            currentCategory === 'all' ||
+            category === currentCategory;
+
+        const matchSearch =
+            tool.textContent.toLowerCase().includes(query);
+
+        tool.style.display =
+            matchCategory && matchSearch ? '' : 'none';
+    });
+}
+
+</script>
+</body>
+</html>
+
 
 
