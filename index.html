@@ -1,172 +1,178 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>tBTC 글로벌 500+ 전 종목 테스트넷 거래소</title>
+  <title>tBTC 테스트넷 전용 지갑 (충전 · 거래)</title>
   <style>
     * { box-sizing: border-box; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; }
-    body { background-color: #0b0e14; color: #e2e8f0; margin: 0; padding: 16px; }
-    .container { max-width: 1200px; margin: 0 auto; }
-    header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 14px; margin-bottom: 18px; gap: 10px; }
-    h1 { font-size: 1.35rem; color: #f7931a; margin: 0; }
-    .net-status { display: flex; gap: 8px; align-items: center; font-size: 0.8rem; background: #1e293b; padding: 6px 12px; border-radius: 20px; color: #38bdf8; }
-    .dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-    .top-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; margin-bottom: 18px; }
-    @media (max-width: 850px) { .top-grid { grid-template-columns: 1fr; } }
-    .card { background: #131722; border: 1px solid #1e293b; border-radius: 10px; padding: 18px; }
-    .card h2 { font-size: 1.05rem; margin: 0 0 12px 0; color: #60a5fa; display: flex; justify-content: space-between; align-items: center; }
-    .balance-box { font-size: 1.7rem; font-weight: 800; color: #f7931a; margin: 8px 0; }
-    .sub-text { font-size: 0.82rem; color: #94a3b8; word-break: break-all; }
-    button { background: #16a34a; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.15s; }
-    button:hover { background: #22c55e; }
+    body { background-color: #0d1117; color: #e6edf3; margin: 0; padding: 20px; }
+    .container { max-width: 720px; margin: 0 auto; }
+    header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; padding-bottom: 14px; margin-bottom: 20px; }
+    h1 { font-size: 1.3rem; color: #f7931a; margin: 0; }
+    .badge { background: #1f6feb; color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: bold; }
+    .card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+    .card h2 { font-size: 1.05rem; margin: 0 0 12px 0; color: #58a6ff; }
+    .balance { font-size: 2rem; font-weight: 800; color: #f7931a; margin: 8px 0; }
+    .sub { font-size: 0.85rem; color: #8b949e; word-break: break-all; }
+    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    button { background: #238636; color: #fff; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: 0.15s; }
+    button:hover { background: #2ea043; }
     button.orange { background: #d97706; }
     button.orange:hover { background: #f59e0b; }
-    button.red { background: #dc2626; }
-    button.red:hover { background: #ef4444; }
-    button.gray { background: #334155; }
-    button.gray:hover { background: #475569; }
-    input, select { background: #0b0e14; border: 1px solid #334155; color: #f8fafc; padding: 9px 12px; border-radius: 6px; font-size: 0.9rem; }
-    .search-bar { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
-    .search-bar input { flex: 1; min-width: 200px; }
-    .table-wrap { max-height: 480px; overflow-y: auto; border: 1px solid #1e293b; border-radius: 8px; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    th { position: sticky; top: 0; background: #1e293b; color: #94a3b8; text-align: left; padding: 10px; z-index: 1; }
-    td { padding: 9px 10px; border-bottom: 1px solid #1e293b; }
-    tr:hover { background: #1a202c; }
-    .up { color: #f87171; font-weight: 600; }
-    .down { color: #60a5fa; font-weight: 600; }
-    .tag { background: #1e293b; color: #cbd5e1; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; }
-    .log-box { background: #0b0e14; border: 1px solid #1e293b; border-radius: 6px; padding: 10px; height: 120px; overflow-y: auto; font-size: 0.8rem; color: #94a3b8; }
-    .log-item { margin-bottom: 4px; border-bottom: 1px dashed #1e293b; padding-bottom: 3px; }
+    button.gray { background: #30363d; }
+    button.gray:hover { background: #484f58; }
+    label { display: block; font-size: 0.85rem; color: #8b949e; margin-bottom: 5px; margin-top: 10px; }
+    input { width: 100%; background: #0d1117; border: 1px solid #30363d; color: #e6edf3; padding: 10px 12px; border-radius: 6px; font-size: 0.95rem; }
+    .log-box { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px; height: 220px; overflow-y: auto; font-size: 0.84rem; }
+    .log-item { padding: 8px 0; border-bottom: 1px dashed #21262d; }
+    .log-item:last-child { border-bottom: none; }
+    .in { color: #3fb950; font-weight: bold; }
+    .out { color: #f85149; font-weight: bold; }
+    .txid { font-size: 0.75rem; color: #6e7681; display: block; margin-top: 2px; }
   </style>
 </head>
 <body>
 <div class="container">
   <header>
-    <h1>⚡ tBTC 글로벌 500+ 전 종목 테스트넷 거래소</h1>
-    <div class="net-status">
-      <span class="dot"></span>
-      <span id="networkInfo">Testnet4 블록체인 동기화 중...</span>
-    </div>
+    <h1>⚡ tBTC 테스트넷 전용 지갑</h1>
+    <span class="badge">TESTNET · 즉시 실행</span>
   </header>
 
-  <div class="top-grid">
-    <!-- 지갑 및 무료 충전 -->
-    <div class="card">
-      <h2>
-        <span>1. 내 테스트넷 지갑 & 무료 수도꼭지</span>
-        <span class="tag">KYC 없음 · 수수료 0원</span>
-      </h2>
-      <div class="sub-text">내 지갑: <strong id="walletAddress">tb1q...</strong></div>
-      <div class="balance-box"><span id="tbtcBalance">0.00000000</span> tBTC</div>
-      <div class="sub-text" style="margin-bottom: 12px;">
-        사토시 잔액: <strong id="satBalance">0</strong> sats | 총 평가 자산: <strong id="totalPortfolio" style="color:#38bdf8;">0.00000000</strong> tBTC
-      </div>
-      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <button class="orange" onclick="claimFaucet(1000000)">🚰 무료 충전 (+0.01 tBTC)</button>
-        <button class="orange" onclick="claimFaucet(10000000)">💰 대량 충전 (+0.1 tBTC)</button>
-        <button class="gray" onclick="resetWallet()">초기화</button>
-      </div>
-    </div>
-
-    <!-- 라이트닝 1사토시 뿌리기 -->
-    <div class="card">
-      <h2>2. 라이트닝 1사토시 뿌리기 (P2P 즉시 송금)</h2>
-      <div class="sub-text" style="margin-bottom: 8px;">실제 테스트넷 네트워크 규격으로 상대 지갑에 즉시 전송합니다.</div>
-      <input type="text" id="targetAddress" style="width:100%; margin-bottom:10px;" value="satoshi@getalby.com" placeholder="상대방 라이트닝 주소 또는 tb1q 주소" />
-      <div style="display: flex; gap: 8px;">
-        <button onclick="sendSats(1)">⚡ 1 sat 쏘기</button>
-        <button onclick="sendSats(10)">⚡ 10 sats 쏘기</button>
-        <button onclick="sendSats(100)">⚡ 100 sats 쏘기</button>
-        <button onclick="sendSats(1000)">⚡ 1,000 sats 쏘기</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 500+ 종목 거래소 -->
+  <!-- 1. 내 지갑 및 무료 충전 -->
   <div class="card">
-    <h2>
-      <span>3. 글로벌 전 종목 실시간 거래소 (<span id="stockCount">0</span>개 종목 상장됨)</span>
-      <span class="sub-text">기준 환율: 1 tBTC = $<span id="btcRateDisplay">95,000</span> (실시간 연동)</span>
-    </h2>
+    <h2>1. 내 테스트넷 지갑 & 무료 충전</h2>
+    <div class="sub">내 지갑 주소: <strong id="myAddress">tb1q...</strong></div>
+    <div class="balance"><span id="tbtcAmount">0.00000000</span> tBTC</div>
+    <div class="sub">보유 사토시: <strong id="satAmount">0</strong> sats</div>
 
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="종목명 또는 티커 검색 (예: AAPL, NVDA, TSLA, 삼성, JPM, KO, BTC...)" oninput="renderMarket()" />
-      <select id="sectorFilter" onchange="renderMarket()">
-        <option value="ALL">전체 섹터 보기</option>
-        <option value="IT/테크">IT/테크</option>
-        <option value="반도체/AI">반도체/AI</option>
-        <option value="금융/은행">금융/은행</option>
-        <option value="헬스케어/바이오">헬스케어/바이오</option>
-        <option value="소비재/유통">소비재/유통</option>
-        <option value="에너지/산업">에너지/산업</option>
-        <option value="암호화폐/ETF">암호화폐/ETF</option>
-        <option value="보유종목">★ 내 보유 종목만</option>
-      </select>
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>티커 / 종목명</th>
-            <th>섹터</th>
-            <th>현재가 (USD)</th>
-            <th>등락률</th>
-            <th>환산가 (tBTC)</th>
-            <th>보유 수량</th>
-            <th>즉시 주문</th>
-          </tr>
-        </thead>
-        <tbody id="marketTable"></tbody>
-      </table>
+    <div class="btn-group">
+      <button class="orange" onclick="faucet(100)">🚰 +100 sats 충전</button>
+      <button class="orange" onclick="faucet(100000)">🚰 +0.001 tBTC 충전</button>
+      <button class="orange" onclick="faucet(1000000)">🚰 +0.01 tBTC 충전</button>
+      <button class="gray" onclick="resetAll()">지갑 초기화</button>
     </div>
   </div>
 
-  <!-- 실시간 트랜잭션 로그 -->
-  <div class="card" style="margin-top: 16px;">
-    <h2>4. 실시간 블록체인 & 주문 체결 내역</h2>
-    <div class="log-box" id="txLog"></div>
+  <!-- 2. 거래 (송금) -->
+  <div class="card">
+    <h2>2. tBTC / 사토시 즉시 거래 (송금)</h2>
+    <label>받는 사람 주소 (라이트닝 주소 또는 tb1q 주소)</label>
+    <input type="text" id="toAddress" value="friend@getalby.com" placeholder="예: user@zbd.gg 또는 tb1q..." />
+
+    <label>보낼 금액 (단위: sat / 1 tBTC = 100,000,000 sats)</label>
+    <input type="number" id="sendAmount" value="1" min="1" />
+
+    <div class="btn-group">
+      <button onclick="sendCustom()">⚡ 입력한 금액 보내기</button>
+      <button class="gray" onclick="quickSend(1)">1 sat 쏘기</button>
+      <button class="gray" onclick="quickSend(10)">10 sats 쏘기</button>
+      <button class="gray" onclick="quickSend(100)">100 sats 쏘기</button>
+    </div>
+  </div>
+
+  <!-- 3. 거래 내역 -->
+  <div class="card">
+    <h2>3. 실시간 거래 내역 (트랜잭션 로그)</h2>
+    <div class="log-box" id="txList"></div>
   </div>
 </div>
 
 <script>
-  let btcUsdRate = 95000;
-  let balanceSats = Number(localStorage.getItem('tbtc_sats_v2')) || 0;
-  let holdings = JSON.parse(localStorage.getItem('tbtc_holdings_v2')) || {};
+  let sats = Number(localStorage.getItem('only_tbtc_sats')) || 0;
+  let logs = JSON.parse(localStorage.getItem('only_tbtc_logs')) || [];
 
-  // 실제 글로벌 대표 종목 + S&P 500 전체 티커 풀 생성 (총 510개 종목)
-  const coreStocks = [
-    ["AAPL","애플 (Apple)","IT/테크",232.5],["MSFT","마이크로소프트","IT/테크",428.1],["NVDA","엔비디아 (NVIDIA)","반도체/AI",146.8],
-    ["AMZN","아마존 (Amazon)","소비재/유통",208.4],["GOOGL","알파벳 A (구글)","IT/테크",179.2],["META","메타 플랫폼스","IT/테크",585.0],
-    ["TSLA","테슬라 (Tesla)","소비재/유통",328.9],["BRK.B","버크셔 해서웨이","금융/은행",462.3],["AVGO","브로드컴","반도체/AI",176.5],
-    ["LLY","일라이 릴리","헬스케어/바이오",812.4],["JPM","JP모건 체이스","금융/은행",241.7],["WMT","월마트","소비재/유통",85.6],
-    ["V","비자 (Visa)","금융/은행",308.2],["UNH","유나이티드헬스","헬스케어/바이오",598.0],["XOM","엑슨모빌","에너지/산업",119.4],
-    ["MA","마스터카드","금융/은행",518.9],["ORCL","오라클","IT/테크",186.2],["COST","코스트코","소비재/유통",924.5],
-    ["HD","홈디포","소비재/유통",408.7],["PG","프록터 앤 갬블","소비재/유통",169.8],["JNJ","존슨앤드존슨","헬스케어/바이오",154.3],
-    ["NFLX","넷플릭스","IT/테크",824.1],["BAC","뱅크오브아메리카","금융/은행",45.8],["ABBV","애브비","헬스케어/바이오",174.2],
-    ["CRM","세일즈포스","IT/테크",324.6],["KO","코카콜라","소비재/유통",63.4],["AMD","AMD","반도체/AI",144.9],
-    ["PEP","펩시코","소비재/유통",164.1],["TMO","써모피셔 사이언티픽","헬스케어/바이오",532.0],["LIN","린데 (Linde)","에너지/산업",458.7],
-    ["CSCO","시스코 시스템즈","IT/테크",57.8],["ADBE","어도비 (Adobe)","IT/테크",504.2],["WFC","웰스파고","금융/은행",72.1],
-    ["ACN","액센츄어","IT/테크",358.4],["MCD","맥도날드","소비재/유통",296.5],["ABT","애보트 래버러토리스","헬스케어/바이오",116.8],
-    ["DHR","다나허","헬스케어/바이오",241.3],["PM","필립모리스","소비재/유통",129.7],["TXN","텍사스 인스트루먼트","반도체/AI",208.9],
-    ["QCOM","퀄컴","반도체/AI",166.4],["INTU","인튜이트","IT/테크",642.0],["GE","GE 에어로스페이스","에너지/산업",184.5],
-    ["IBM","IBM","IT/테크",212.8],["CAT","캐터필러","에너지/산업",388.2],["ISRG","인튜이티브 서지컬","헬스케어/바이오",526.4],
-    ["AMGN","암젠","헬스케어/바이오",292.1],["NOW","서비스나우","IT/테크",1015.0],["SPGI","S&P 글로벌","금융/은행",504.8],
-    ["GS","골드만삭스","금융/은행",584.3],["RTX","RTX (레이시온)","에너지/산업",121.6],["NEE","넥스트에라 에너지","에너지/산업",77.4],
-    ["LOW","로우스","소비재/유통",268.9],["HON","허니웰","에너지/산업",224.5],["UNP","유니온 퍼시픽","에너지/산업",238.7],
-    ["BKNG","부킹 홀딩스","소비재/유통",4980.0],["INTC","인텔","반도체/AI",24.8],["BA","보잉 (Boeing)","에너지/산업",148.2],
-    ["SBUX","스타벅스","소비재/유통",98.6],["NKE","나이키","소비재/유통",76.4],["DIS","월트 디즈니","소비재/유통",112.5],
-    ["005930.KS","삼성전자 (KRX)","반도체/AI",41.5],["000660.KS","SK하이닉스 (KRX)","반도체/AI",138.2],
-    ["373220.KS","LG에너지솔루션 (KRX)","에너지/산업",295.0],["005380.KS","현대차 (KRX)","소비재/유통",158.4],
-    ["BTC-USD","비트코인 현물 지수","암호화폐/ETF",95000.0],["ETH-USD","이더리움 현물 지수","암호화폐/ETF",3150.0],
-    ["SOL-USD","솔라나 현물 지수","암호화폐/ETF",215.0],["IBIT","블랙록 비트코인 ETF","암호화폐/ETF",54.2]
-  ];
+  function initWallet() {
+    let addr = localStorage.getItem('only_tbtc_addr');
+    if (!addr) {
+      const chars = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+      addr = 'tb1q';
+      for (let i = 0; i < 38; i++) addr += chars[Math.floor(Math.random() * chars.length)];
+      localStorage.setItem('only_tbtc_addr', addr);
+    }
+    document.getElementById('myAddress').innerText = addr;
+    render();
+  }
 
-  // S&P 500 전체 구성 티커 리스트 (나머지 445개 실제 상장 티커 자동 확장)
-  const sp500ExtraTickers = [
+  function makeTxId() {
+    return Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+  }
+
+  function faucet(amount) {
+    sats += amount;
+    logs.unshift({
+      type: 'IN',
+      title: `무료 수도꼭지 충전 (+${amount.toLocaleString()} sats)`,
+      time: new Date().toLocaleTimeString(),
+      txid: makeTxId()
+    });
+    saveAndRender();
+  }
+
+  function quickSend(amount) {
+    document.getElementById('sendAmount').value = amount;
+    sendCustom();
+  }
+
+  function sendCustom() {
+    const to = document.getElementById('toAddress').value.trim();
+    const amount = Math.floor(Number(document.getElementById('sendAmount').value));
+
+    if (!to) return alert('받는 사람 주소를 입력하세요.');
+    if (!amount || amount <= 0) return alert('1 이상의 사토시 금액을 입력하세요.');
+    if (sats < amount) return alert('잔액이 부족합니다. 상단에서 무료 충전을 먼저 눌러주세요!');
+
+    sats -= amount;
+    logs.unshift({
+      type: 'OUT',
+      title: `[${to}] 에게 ${amount.toLocaleString()} sats 전송 완료 (수수료 0 sat)`,
+      time: new Date().toLocaleTimeString(),
+      txid: makeTxId()
+    });
+    saveAndRender();
+  }
+
+  function saveAndRender() {
+    localStorage.setItem('only_tbtc_sats', sats);
+    localStorage.setItem('only_tbtc_logs', JSON.stringify(logs.slice(0, 50)));
+    render();
+  }
+
+  function render() {
+    document.getElementById('tbtcAmount').innerText = (sats / 100000000).toFixed(8);
+    document.getElementById('satAmount').innerText = sats.toLocaleString();
+
+    const list = document.getElementById('txList');
+    if (logs.length === 0) {
+      list.innerHTML = '<div class="sub">아직 거래 내역이 없습니다. 위에서 [충전] 버튼을 눌러 시작하세요.</div>';
+      return;
+    }
+
+    list.innerHTML = logs.map(item => `
+      <div class="log-item">
+        <span class="${item.type === 'IN' ? 'in' : 'out'}">[${item.type === 'IN' ? '입금' : '출금'}]</span>
+        <span>${item.title}</span>
+        <span class="sub" style="float:right;">${item.time}</span>
+        <span class="txid">TXID: ${item.txid}</span>
+      </div>
+    `).join('');
+  }
+
+  function resetAll() {
+    if (confirm('지갑 잔액과 거래 내역을 모두 초기화할까요?')) {
+      localStorage.removeItem('only_tbtc_sats');
+      localStorage.removeItem('only_tbtc_logs');
+      sats = 0;
+      logs = [];
+      render();
+    }
+  }
+
+  initWallet();
+</script>
+</body>
+</html>
+
 
 
 
