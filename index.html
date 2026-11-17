@@ -1,257 +1,424 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>비트코인 테스트넷 조회기</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            border-radius: 0 !important;
-        }
-        body {
-            font-family: "Courier New", Courier, monospace, -apple-system, sans-serif;
-            background-color: #000000;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            background-color: #000000;
-            padding: 24px;
-            border: 2px solid #ffffff;
-            width: 100%;
-            max-width: 500px;
-        }
-        h1 {
-            font-size: 1.25rem;
-            margin: 0 0 20px 0;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #ffffff;
-            color: #ffffff;
-            text-align: left;
-            letter-spacing: -0.5px;
-        }
-        .select-group, .input-group {
-            margin-bottom: 16px;
-        }
-        label {
-            display: block;
-            font-size: 0.85rem;
-            margin-bottom: 6px;
-            color: #ffffff;
-            font-weight: bold;
-        }
-        select, input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ffffff;
-            background-color: #000000;
-            color: #ffffff;
-            font-size: 0.95rem;
-            font-family: inherit;
-            outline: none;
-        }
-        select:focus, input:focus {
-            border: 2px solid #ffffff;
-            padding: 11px;
-        }
-        button {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #ffffff;
-            background-color: #ffffff;
-            color: #000000;
-            font-size: 1rem;
-            font-weight: bold;
-            font-family: inherit;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #000000;
-            color: #ffffff;
-        }
-        button:disabled {
-            background-color: #000000;
-            color: #ffffff;
-            border-style: dashed;
-            cursor: not-allowed;
-        }
-        .result-box {
-            margin-top: 20px;
-            padding: 16px;
-            background-color: #000000;
-            border: 1px solid #ffffff;
-            display: none;
-        }
-        .result-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 0.95rem;
-            border-bottom: 1px solid #ffffff;
-            padding-bottom: 6px;
-        }
-        .result-row:last-child {
-            margin-bottom: 0;
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-        .highlight {
-            font-weight: bold;
-            text-decoration: underline;
-        }
-        .faucet-section {
-            margin-top: 24px;
-            padding-top: 20px;
-            border-top: 2px solid #ffffff;
-        }
-        .faucet-title {
-            font-size: 0.95rem;
-            font-weight: bold;
-            margin-bottom: 12px;
-            color: #ffffff;
-        }
-        .faucet-links a {
-            display: block;
-            padding: 10px 12px;
-            margin-bottom: 8px;
-            background-color: #000000;
-            color: #ffffff;
-            border: 1px solid #ffffff;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-        .faucet-links a:hover {
-            background-color: #ffffff;
-            color: #000000;
-            font-weight: bold;
-        }
-        .error {
-            color: #ffffff;
-            background-color: #000000;
-            border: 1px solid #ffffff;
-            padding: 10px;
-            font-size: 0.9rem;
-            margin-top: 12px;
-            text-align: center;
-            display: none;
-        }
-        .error:not(:empty) {
-            display: block;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VisionFlow</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    background: #10131a;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 650px;
+    margin: auto;
+}
+
+h1 {
+    font-size: 30px;
+    margin-bottom: 5px;
+}
+
+.sub {
+    color: #9da6b8;
+    margin-bottom: 25px;
+}
+
+.panel {
+    background: #1b202b;
+    padding: 18px;
+    border-radius: 15px;
+    margin-bottom: 16px;
+}
+
+input {
+    width: 100%;
+    padding: 13px;
+    margin-top: 10px;
+    background: #10131a;
+    border: 1px solid #414a5c;
+    border-radius: 8px;
+    color: white;
+    font-size: 15px;
+}
+
+button {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #647cff;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 12px;
+    margin-right: 5px;
+}
+
+button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.stop {
+    background: #d94e62;
+}
+
+video {
+    width: 100%;
+    display: block;
+    background: black;
+    border-radius: 12px;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+}
+
+#result {
+    min-height: 90px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    color: #e2e7f0;
+}
+
+#status {
+    color: #9eafff;
+    font-size: 14px;
+}
+
+.small {
+    color: #8e98aa;
+    font-size: 12px;
+    line-height: 1.6;
+}
+</style>
 </head>
+
 <body>
-
 <div class="container">
-    <h1>[ BITCOIN TESTNET EXPLORER ]</h1>
-    
-    <div class="select-group">
-        <label for="network">NETWORK / 네트워크 선택</label>
-        <select id="network">
-            <option value="testnet4">Testnet4 (최신 테스트넷)</option>
-            <option value="testnet">Testnet3 (기존 테스트넷)</option>
-        </select>
+
+    <h1>VisionFlow</h1>
+    <div class="sub">AI 실시간 카메라 인식</div>
+
+    <div class="panel">
+        <h3>Gemini API 설정</h3>
+
+        <input
+            id="apiKey"
+            type="password"
+            placeholder="Gemini API 키 입력"
+            autocomplete="off"
+        >
+
+        <button id="saveButton">API 키 적용</button>
+
+        <p class="small">
+            API 키는 이 페이지의 메모리에만 보관합니다.
+            페이지를 새로고침하면 다시 입력해야 합니다.
+        </p>
     </div>
 
-    <div class="input-group">
-        <label for="address">ADDRESS / 테스트넷 지갑 주소 (m, n, 2, tb1)</label>
-        <input type="text" id="address" placeholder="tb1q... / m... / n...">
+    <div class="panel">
+        <h3>카메라</h3>
+
+        <video id="camera" autoplay muted playsinline></video>
+
+        <button id="startButton">카메라 시작</button>
+        <button id="stopButton" class="stop">카메라 중지</button>
+
+        <p id="status">카메라 권한을 요청하는 중...</p>
     </div>
 
-    <button id="checkBtn" onclick="checkBalance()">잔액 조회하기</button>
-    <div id="errorMsg" class="error"></div>
-
-    <div id="resultBox" class="result-box">
-        <div class="result-row">
-            <span>확인된 잔액:</span>
-            <span id="confirmedBalance" class="highlight">0 tBTC</span>
-        </div>
-        <div class="result-row">
-            <span>대기 중 (미승인):</span>
-            <span id="unconfirmedBalance">0 tBTC</span>
-        </div>
-        <div class="result-row">
-            <span>총 받은 코인:</span>
-            <span id="totalReceived">0 tBTC</span>
-        </div>
+    <div class="panel">
+        <h3>AI 인식 결과</h3>
+        <div id="result">아직 인식한 결과가 없습니다.</div>
     </div>
 
-    <div class="faucet-section">
-        <div class="faucet-title">[ FAUCET / 무료 테스트넷 코인 받기 ]</div>
-        <div class="faucet-links">
-            <a href="https://mempool.space" target="_blank" rel="noopener noreferrer">1. Mempool 공식 Testnet4 수도꼭지 ↗</a>
-            <a href="https://coinfaucet.eu" target="_blank" rel="noopener noreferrer">2. CoinFaucet (Testnet4) 수도꼭지 ↗</a>
-            <a href="https://coinfaucet.eu" target="_blank" rel="noopener noreferrer">3. CoinFaucet (Testnet3) 수도꼭지 ↗</a>
-            <a href="https://uo1.net" target="_blank" rel="noopener noreferrer">4. UO1.net (Testnet3) 수도꼭지 ↗</a>
-        </div>
-    </div>
+    <canvas id="canvas" hidden></canvas>
+
 </div>
 
 <script>
-    async function checkBalance() {
-        const network = document.getElementById('network').value;
-        const address = document.getElementById('address').value.trim();
-        const errorMsg = document.getElementById('errorMsg');
-        const resultBox = document.getElementById('resultBox');
-        const checkBtn = document.getElementById('checkBtn');
+const camera = document.getElementById("camera");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-        errorMsg.textContent = '';
-        resultBox.style.display = 'none';
+const apiInput = document.getElementById("apiKey");
+const statusText = document.getElementById("status");
+const resultText = document.getElementById("result");
 
-        if (!address) {
-            errorMsg.textContent = '[ERROR] 지갑 주소를 입력해 주세요.';
-            return;
-        }
+const startButton = document.getElementById("startButton");
+const stopButton = document.getElementById("stopButton");
+const saveButton = document.getElementById("saveButton");
 
-        if (address.startsWith('1') || address.startsWith('3') || address.startsWith('bc1')) {
-            errorMsg.textContent = '[WARNING] 테스트넷이 아닌 실제 비트코인(메인넷) 주소입니다.';
-            return;
-        }
+const MODEL = "gemini-2.5-flash";
 
-        checkBtn.disabled = true;
-        checkBtn.textContent = '조회 중...';
+let apiKey = "";
+let cameraStream = null;
+let running = false;
+let analyzing = false;
+let timer = null;
 
-        try {
-            const response = await fetch(`https://mempool.space{network}/api/address/${address}`);
-            
-            if (!response.ok) {
-                throw new Error('[ERROR] 올바르지 않은 테스트넷 주소이거나 네트워크 응답 오류입니다.');
-            }
 
-            const data = await response.json();
+// 상태 표시
+function setStatus(message) {
+    statusText.textContent = message;
+}
 
-            const confirmed = (data.chain_stats.funded_txo_sum - data.chain_stats.spent_txo_sum) / 100000000;
-            const unconfirmed = (data.mempool_stats.funded_txo_sum - data.mempool_stats.spent_txo_sum) / 100000000;
-            const totalReceived = data.chain_stats.funded_txo_sum / 100000000;
 
-            document.getElementById('confirmedBalance').textContent = confirmed.toFixed(8) + ' tBTC';
-            document.getElementById('unconfirmedBalance').textContent = (unconfirmed >= 0 ? '+' : '') + unconfirmed.toFixed(8) + ' tBTC';
-            document.getElementById('totalReceived').textContent = totalReceived.toFixed(8) + ' tBTC';
+// API 키 적용
+saveButton.addEventListener("click", () => {
+    const key = apiInput.value.trim();
 
-            resultBox.style.display = 'block';
-        } catch (err) {
-            errorMsg.textContent = err.message;
-        } finally {
-            checkBtn.disabled = false;
-            checkBtn.textContent = '잔액 조회하기';
-        }
+    if (!key) {
+        setStatus("API 키를 입력하세요.");
+        return;
     }
 
-    document.getElementById('address').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            checkBalance();
-        }
-    });
-</script>
+    apiKey = key;
 
+    setStatus("API 키 적용 완료!");
+
+    if (cameraStream && !running) {
+        startRecognition();
+    }
+});
+
+
+// 카메라 시작
+async function startCamera() {
+    try {
+        if (!navigator.mediaDevices ||
+            !navigator.mediaDevices.getUserMedia) {
+            throw new Error(
+                "HTTPS 또는 localhost 환경에서 실행해야 합니다."
+            );
+        }
+
+        setStatus("카메라 권한을 요청하는 중...");
+
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {
+                facingMode: { ideal: "environment" },
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            }
+        });
+
+        camera.srcObject = cameraStream;
+
+        await camera.play();
+
+        setStatus("카메라 실행 완료!");
+
+        if (apiKey) {
+            startRecognition();
+        } else {
+            setStatus("카메라 실행 완료! API 키를 적용하세요.");
+        }
+
+    } catch (error) {
+        setStatus("카메라 오류: " + error.message);
+    }
+}
+
+
+// 카메라 중지
+function stopCamera() {
+    stopRecognition();
+
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
+
+    camera.srcObject = null;
+
+    setStatus("카메라가 중지되었습니다.");
+}
+
+
+// 인식 시작
+function startRecognition() {
+    if (!cameraStream) {
+        setStatus("먼저 카메라를 시작하세요.");
+        return;
+    }
+
+    if (!apiKey) {
+        setStatus("API 키를 먼저 적용하세요.");
+        return;
+    }
+
+    if (running) return;
+
+    running = true;
+
+    setStatus("AI 실시간 인식 중...");
+
+    analyzeLoop();
+}
+
+
+// 인식 중지
+function stopRecognition() {
+    running = false;
+
+    if (timer) {
+        clearTimeout(timer);
+        timer = null;
+    }
+
+    setStatus("AI 인식이 중지되었습니다.");
+}
+
+
+// 이미지 분석 반복
+async function analyzeLoop() {
+    if (!running) return;
+
+    if (!analyzing && camera.readyState >= 2) {
+        analyzing = true;
+
+        try {
+            const image = captureImage();
+
+            setStatus("Gemini가 이미지를 분석 중...");
+
+            const answer = await askGemini(image);
+
+            resultText.textContent = answer;
+
+            setStatus("인식 완료 · 다음 이미지 대기 중");
+
+        } catch (error) {
+            setStatus("분석 오류: " + error.message);
+        }
+
+        analyzing = false;
+    }
+
+    if (running) {
+        timer = setTimeout(analyzeLoop, 3000);
+    }
+}
+
+
+// 카메라 이미지 캡처
+function captureImage() {
+    const maxWidth = 768;
+
+    const scale = Math.min(
+        1,
+        maxWidth / camera.videoWidth
+    );
+
+    canvas.width = Math.round(camera.videoWidth * scale);
+    canvas.height = Math.round(camera.videoHeight * scale);
+
+    ctx.drawImage(
+        camera,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    return canvas.toDataURL("image/jpeg", 0.75).split(",")[1];
+}
+
+
+// Gemini API 호출
+async function askGemini(base64Image) {
+    const url =
+        `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+
+    const response = await fetch(url, {
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey
+        },
+
+        body: JSON.stringify({
+            contents: [{
+                parts: [
+                    {
+                        text:
+                            "이 이미지에 보이는 주요 물체와 장면을 한국어로 설명해 줘. " +
+                            "물체의 이름과 특징을 간결하게 알려 줘. " +
+                            "확실하지 않은 내용은 추측이라고 밝혀 줘."
+                    },
+                    {
+                        inline_data: {
+                            mime_type: "image/jpeg",
+                            data: base64Image
+                        }
+                    }
+                ]
+            }],
+
+            generationConfig: {
+                temperature: 0.2,
+                maxOutputTokens: 150
+            }
+        })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.error?.message || `API 오류: ${response.status}`
+        );
+    }
+
+    const answer =
+        data.candidates?.[0]?.content?.parts
+            ?.map(part => part.text || "")
+            .join("")
+            .trim();
+
+    if (!answer) {
+        throw new Error("AI가 인식 결과를 반환하지 않았습니다.");
+    }
+
+    return answer;
+}
+
+
+// 버튼 이벤트
+startButton.addEventListener("click", startCamera);
+stopButton.addEventListener("click", stopCamera);
+
+
+// 페이지를 열면 카메라 권한 요청
+window.addEventListener("load", () => {
+    startCamera();
+});
+
+
+// 페이지를 벗어나면 카메라 정리
+window.addEventListener("beforeunload", () => {
+    stopCamera();
+});
+
+</script>
 </body>
 </html>
+
+
 
 
 
