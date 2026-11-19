@@ -1,616 +1,87 @@
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const app = express();
 
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VisionFlow</title>
+const DATA_FILE = path.join(__dirname, 'ips.json');
 
-<style>
-* {
-    box-sizing: border-box;
+app.set('trust proxy', true);
+app.use(express.json());
+
+// 데이터 파일 초기화
+if (!fs.existsSync(DATA_FILE)) {
+  fs.writeFileSync(DATA_FILE, JSON.stringify([]));
 }
 
-body {
-    margin: 0;
-    padding: 20px;
-    background: #10131a;
-    color: white;
-    font-family: Arial, sans-serif;
-}
+// 1. 프론트엔드 HTML 화면 제공
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+      <meta charset="UTF-8">
+      <title>IP 기록 목록</title>
+      <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        ul { margin-top: 20px; padding-left: 20px; }
+        li { margin-bottom: 8px; }
+      </style>
+    </head>
+    <body>
+      <h2>IP 기록 테스트</h2>
+      <p>버튼을 누르면 현재 접속 IP가 서버에 저장되고 아래 목록에 추가됩니다.</p>
+      <button id="saveBtn">IP 저장하기</button>
+      <ul id="ipList"></ul>
 
-.container {
-    max-width: 650px;
-    margin: auto;
-}
+      <script>
+        const ipList = document.getElementById('ipList');
 
-h1 {
-    font-size: 30px;
-    margin-bottom: 5px;
-}
-
-.sub {
-    color: #9da6b8;
-    margin-bottom: 25px;
-}
-
-.panel {
-    background: #1b202b;
-    padding: 18px;
-    border-radius: 15px;
-    margin-bottom: 16px;
-}
-
-input {
-    width: 100%;
-    padding: 13px;
-    margin-top: 10px;
-    background: #10131a;
-    border: 1px solid #414a5c;
-    border-radius: 8px;
-    color: white;
-    font-size: 15px;
-}
-
-button {
-    padding: 12px 16px;
-    border: none;
-    border-radius: 8px;
-    background: #647cff;
-    color: white;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 12px;
-    margin-right: 5px;
-}
-
-button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-.stop {
-    background: #d94e62;
-}
-
-video {
-    width: 100%;
-    display: block;
-    background: black;
-    border-radius: 12px;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-}
-
-#result {
-    min-height: 90px;
-    line-height: 1.7;
-    white-space: pre-wrap;
-    color: #e2e7f0;
-}
-
-#status {
-    color: #9eafff;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-.small {
-    color: #8e98aa;
-    font-size: 12px;
-    line-height: 1.6;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-    <h1>VisionFlow</h1>
-    <div class="sub">Gemini 실시간 카메라 인식</div>
-
-    <!-- API 설정 -->
-    <div class="panel">
-        <h3>Gemini API 설정</h3>
-
-        <input
-            id="apiKey"
-            type="password"
-            placeholder="Gemini API 키 입력"
-            autocomplete="off"
-        >
-
-        <button id="saveButton">API 키 적용</button>
-
-        <p class="small">
-            API 키는 현재 페이지가 열려 있는 동안에만 보관합니다.
-            새로고침하면 다시 입력해야 합니다.
-        </p>
-    </div>
-
-    <!-- 카메라 -->
-    <div class="panel">
-
-        <h3>카메라</h3>
-
-        <video
-            id="camera"
-            autoplay
-            muted
-            playsinline
-        ></video>
-
-        <button id="startButton">카메라 시작</button>
-        <button id="stopButton" class="stop">카메라 중지</button>
-
-        <p id="status">카메라 권한을 요청하는 중...</p>
-
-    </div>
-
-    <!-- 인식 결과 -->
-    <div class="panel">
-
-        <h3>AI 인식 결과</h3>
-
-        <div id="result">
-            아직 인식한 결과가 없습니다.
-        </div>
-
-    </div>
-
-    <canvas id="canvas" hidden></canvas>
-
-</div>
-
-
-<script>
-
-// ======================================
-// 1. 기본 설정
-// ======================================
-
-const MODEL = "gemini-3.8-flash";
-
-const API_URL =
-    "https://generativelanguage.googleapis.com/v1beta/interactions";
-
-const camera = document.getElementById("camera");
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-
-const apiInput = document.getElementById("apiKey");
-
-const statusText = document.getElementById("status");
-const resultText = document.getElementById("result");
-
-const startButton = document.getElementById("startButton");
-const stopButton = document.getElementById("stopButton");
-const saveButton = document.getElementById("saveButton");
-
-let apiKey = "";
-let cameraStream = null;
-
-let running = false;
-let analyzing = false;
-let timer = null;
-
-
-// ======================================
-// 2. 상태 표시
-// ======================================
-
-function setStatus(message) {
-    statusText.textContent = message;
-}
-
-
-// ======================================
-// 3. API 키 적용
-// ======================================
-
-saveButton.addEventListener("click", () => {
-
-    const key = apiInput.value.trim();
-
-    if (!key) {
-        setStatus("API 키를 입력하세요.");
-        return;
-    }
-
-    apiKey = key;
-
-    setStatus("API 키 적용 완료!");
-
-    if (cameraStream && !running) {
-        startRecognition();
-    }
-
-});
-
-
-// ======================================
-// 4. 카메라 실행
-// ======================================
-
-async function startCamera() {
-
-    if (cameraStream) {
-        setStatus("카메라가 이미 실행 중입니다.");
-
-        if (apiKey && !running) {
-            startRecognition();
+        // 저장된 IP 목록 불러오기
+        async function loadIps() {
+          const res = await fetch('/api/ips');
+          const list = await res.json();
+          ipList.innerHTML = list.map(item => 
+            '<li><strong>' + item.ip + '</strong> (' + item.time + ')</li>'
+          ).join('');
         }
 
-        return;
-    }
-
-    try {
-
-        if (
-            !navigator.mediaDevices ||
-            !navigator.mediaDevices.getUserMedia
-        ) {
-            throw new Error(
-                "HTTPS 또는 localhost에서 실행해야 합니다."
-            );
-        }
-
-        setStatus("카메라 권한을 요청하는 중...");
-
-        cameraStream =
-            await navigator.mediaDevices.getUserMedia({
-
-                audio: false,
-
-                video: {
-                    facingMode: {
-                        ideal: "environment"
-                    },
-
-                    width: {
-                        ideal: 1280
-                    },
-
-                    height: {
-                        ideal: 720
-                    }
-                }
-
-            });
-
-        camera.srcObject = cameraStream;
-
-        await camera.play();
-
-        setStatus("카메라 실행 완료!");
-
-        if (apiKey) {
-            startRecognition();
-        } else {
-            setStatus(
-                "카메라 실행 완료! API 키를 적용하세요."
-            );
-        }
-
-    } catch (error) {
-
-        setStatus(
-            "카메라 오류: " + error.message
-        );
-
-        cameraStream = null;
-
-    }
-
-}
-
-
-// ======================================
-// 5. 카메라 종료
-// ======================================
-
-function stopCamera() {
-
-    stopRecognition();
-
-    if (cameraStream) {
-
-        cameraStream.getTracks().forEach(track => {
-            track.stop();
+        // 버튼 클릭 시 IP 저장 요청
+        document.getElementById('saveBtn').addEventListener('click', async () => {
+          await fetch('/api/ips', { method: 'POST' });
+          loadIps();
         });
 
-        cameraStream = null;
-    }
-
-    camera.srcObject = null;
-
-    setStatus("카메라가 중지되었습니다.");
-
-}
-
-
-// ======================================
-// 6. AI 인식 시작
-// ======================================
-
-function startRecognition() {
-
-    if (!cameraStream) {
-        setStatus("먼저 카메라를 실행하세요.");
-        return;
-    }
-
-    if (!apiKey) {
-        setStatus("API 키를 입력하세요.");
-        return;
-    }
-
-    if (running) return;
-
-    running = true;
-
-    setStatus("Gemini 실시간 인식 시작!");
-
-    analyzeLoop();
-
-}
-
-
-// ======================================
-// 7. AI 인식 중지
-// ======================================
-
-function stopRecognition() {
-
-    running = false;
-
-    if (timer) {
-        clearTimeout(timer);
-        timer = null;
-    }
-
-    setStatus("AI 인식이 중지되었습니다.");
-
-}
-
-
-// ======================================
-// 8. 이미지 분석 반복
-// ======================================
-
-async function analyzeLoop() {
-
-    if (!running) return;
-
-    if (
-        !analyzing &&
-        camera.readyState >= 2
-    ) {
-
-        analyzing = true;
-
-        try {
-
-            const image = captureImage();
-
-            setStatus("Gemini가 이미지를 분석 중...");
-
-            const answer = await askGemini(image);
-
-            resultText.textContent = answer;
-
-            setStatus("인식 완료!");
-
-        } catch (error) {
-
-            setStatus(
-                "분석 오류: " + error.message
-            );
-
-        } finally {
-
-            analyzing = false;
-
-        }
-
-    }
-
-    if (running) {
-
-        timer = setTimeout(
-            analyzeLoop,
-            3000
-        );
-
-    }
-
-}
-
-
-// ======================================
-// 9. 카메라 이미지 캡처
-// ======================================
-
-function captureImage() {
-
-    const maxWidth = 768;
-
-    const scale = Math.min(
-        1,
-        maxWidth / camera.videoWidth
-    );
-
-    canvas.width = Math.round(
-        camera.videoWidth * scale
-    );
-
-    canvas.height = Math.round(
-        camera.videoHeight * scale
-    );
-
-    ctx.drawImage(
-        camera,
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-    return canvas.toDataURL(
-        "image/jpeg",
-        0.75
-    ).split(",")[1];
-
-}
-
-
-// ======================================
-// 10. Gemini 3.8 Flash API
-// Interactions API
-// ======================================
-
-async function askGemini(base64Image) {
-
-    const response = await fetch(API_URL, {
-
-        method: "POST",
-
-        headers: {
-
-            "Content-Type": "application/json",
-
-            "x-goog-api-key": apiKey,
-
-            "Api-Revision": "2026-05-20"
-
-        },
-
-        body: JSON.stringify({
-
-            model: MODEL,
-
-            input: [
-
-                {
-                    type: "text",
-
-                    text:
-                        "이 이미지에 보이는 주요 물체와 장면을 " +
-                        "한국어로 설명해 줘. " +
-                        "물체의 이름과 특징을 간결하게 알려 줘. " +
-                        "확실하지 않은 내용은 추측이라고 밝혀 줘."
-
-                },
-
-                {
-                    type: "image",
-
-                    mime_type: "image/jpeg",
-
-                    data: base64Image
-
-                }
-
-            ]
-
-        })
-
-    });
-
-
-    const data = await response.json();
-
-
-    // API 오류 확인
-    if (!response.ok) {
-
-        throw new Error(
-            data.error?.message ||
-            `API 오류: ${response.status}`
-        );
-
-    }
-
-
-    // 응답에서 모델 출력 찾기
-    const output = (data.steps || [])
-
-        .filter(step =>
-            step.type === "model_output"
-        )
-
-        .flatMap(step =>
-            step.content || []
-        )
-
-        .filter(item =>
-            item.type === "text"
-        )
-
-        .map(item =>
-            item.text || ""
-        )
-
-        .join("\n")
-
-        .trim();
-
-
-    if (!output) {
-
-        throw new Error(
-            "AI 응답이 비어 있습니다."
-        );
-
-    }
-
-    return output;
-
-}
-
-
-// ======================================
-// 11. 버튼 연결
-// ======================================
-
-startButton.addEventListener(
-    "click",
-    startCamera
-);
-
-stopButton.addEventListener(
-    "click",
-    stopCamera
-);
-
-
-// ======================================
-// 12. 페이지 시작 시 카메라 권한 요청
-// ======================================
-
-window.addEventListener("load", () => {
-
-    startCamera();
-
+        loadIps();
+      </script>
+    </body>
+    </html>
+  `);
 });
 
-
-// ======================================
-// 13. 페이지 종료 시 카메라 정리
-// ======================================
-
-window.addEventListener("beforeunload", () => {
-
-    stopCamera();
-
+// 2. 저장된 IP 목록 조회 API
+app.get('/api/ips', (req, res) => {
+  const list = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  res.json(list);
 });
 
-</script>
+// 3. IP 저장 API
+app.post('/api/ips', (req, res) => {
+  const rawIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '';
+  const clientIp = rawIp.split(',')[0].trim();
+  const time = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
 
-</body>
-</html>
+  const list = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  list.unshift({ ip: clientIp, time }); // 최신 기록을 맨 위에 추가
+  fs.writeFileSync(DATA_FILE, JSON.stringify(list, null, 2));
+
+  res.json({ status: 'ok' });
+});
+
+app.listen(3000, () => {
+  console.log('실행 중: http://localhost:3000');
+});
+
 
 
 
